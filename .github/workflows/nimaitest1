@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Set the GCP project ID
+PROJECT_ID="your-project-id"
+
+# Step 1: Authenticate with GCP
+gcloud auth login
+
+# Step 2: Set the active project
+gcloud config set project $PROJECT_ID
+
+# Step 3: Disable billing for the project
+BILLING_ACCOUNT=$(gcloud beta billing projects describe $PROJECT_ID --format="value(billingAccountName)")
+if [ -n "$BILLING_ACCOUNT" ]; then
+  echo "Disabling billing for project $PROJECT_ID..."
+  gcloud beta billing projects unlink $PROJECT_ID
+else
+  echo "No billing account linked to project $PROJECT_ID."
+fi
+
+# Step 4: Delete all resources in the project
+echo "Deleting all resources in project $PROJECT_ID..."
+gcloud projects delete $PROJECT_ID --quiet
+
+echo "Project $PROJECT_ID has been deleted."
